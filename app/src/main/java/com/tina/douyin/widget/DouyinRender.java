@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.tina.douyin.filiter.CameraFilter;
 import com.tina.douyin.filiter.ScreenFiliter;
 import com.tina.douyin.util.CameraHelper;
 
@@ -31,6 +32,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private float[] mtx = new float[16];
 
     private ScreenFiliter mScreenFiliter;
+    private CameraFilter mCameraFiliter;
 
 
     public DouyinRender(DouyinView douyinView){
@@ -50,12 +52,14 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
         //准备好画布
         mTextures = new int[1];
+        //这里创建了纹理，直接应用了，没有配置。
         GLES20.glGenTextures(mTextures.length, mTextures, 0);
 
         mSurfaceTexture = new SurfaceTexture(mTextures[0]);
         mSurfaceTexture.setOnFrameAvailableListener(this);
 
         //注意
+        mCameraFiliter = new CameraFilter(mDouyinView.getContext());
         mScreenFiliter = new ScreenFiliter(mDouyinView.getContext());
     }
 
@@ -64,6 +68,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
         //开启预览
         mCameraHelper.startPreview(mSurfaceTexture);
+        mCameraFiliter.onReady(width, height);
         mScreenFiliter.onReady(width, height);
     }
 
@@ -85,7 +90,13 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mSurfaceTexture.getTransformMatrix(mtx);
 
         //进行画画
-        mScreenFiliter.onDrawFrame(mTextures[0], mtx);
+        mCameraFiliter.setMatrix(mtx);
+        //返回处理后的纹理id
+        int id = mCameraFiliter.onDrawFrame(mTextures[0]);
+        //加效果滤镜
+        //......
+        //加完之后显示到屏幕上去
+        mScreenFiliter.onDrawFrame(id);
     }
 
 
