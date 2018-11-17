@@ -2,12 +2,17 @@ package com.tina.douyin.widget;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.opengl.EGL14;
+import android.opengl.EGLContext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import com.tina.douyin.filiter.CameraFilter;
 import com.tina.douyin.filiter.ScreenFiliter;
+import com.tina.douyin.record.MediaRecorder;
 import com.tina.douyin.util.CameraHelper;
+
+import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -33,7 +38,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
     private ScreenFiliter mScreenFiliter;
     private CameraFilter mCameraFiliter;
-
+    private MediaRecorder mMediaRecorder;
 
     public DouyinRender(DouyinView douyinView){
         this.mDouyinView = douyinView;
@@ -58,9 +63,14 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mSurfaceTexture = new SurfaceTexture(mTextures[0]);
         mSurfaceTexture.setOnFrameAvailableListener(this);
 
-        //注意
+        //注意，必须在Gl线程中创建文件
         mCameraFiliter = new CameraFilter(mDouyinView.getContext());
         mScreenFiliter = new ScreenFiliter(mDouyinView.getContext());
+
+        //渲染线程的上下文，需要给到自己的EGL环境下作为share_context
+
+        EGLContext eglContext = EGL14.eglGetCurrentContext();
+        mMediaRecorder = new MediaRecorder(mDouyinView.getContext(), "/sdcard/a.mp4", CameraHelper.HEIGHT, CameraHelper.WIDTH, eglContext);
     }
 
     @Override
@@ -89,7 +99,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //获得变换矩阵， 变换矩阵是一个 4 * 4 的矩阵
         mSurfaceTexture.getTransformMatrix(mtx);
 
-        //进行画画
+        //进行画画，设置变换矩阵。
         mCameraFiliter.setMatrix(mtx);
         //返回处理后的纹理id
         int id = mCameraFiliter.onDrawFrame(mTextures[0]);
@@ -97,6 +107,8 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //......
         //加完之后显示到屏幕上去
         mScreenFiliter.onDrawFrame(id);
+        //录制
+        mMediaRecorder.encodeFrame(id, mSurfaceTexture.getTimestamp());
     }
 
 
@@ -107,4 +119,20 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mDouyinView.requestRender();
     }
 
+    public void onSurfaceDestroyed() {
+        mCameraHelper.stopPreview();
+    }
+
+    public void startRecord(float speed) {
+        try {
+            mMediaRecorder.start(speed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopRecord() {
+        mMediaRecorder.stop();
+
+    }
 }

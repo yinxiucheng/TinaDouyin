@@ -22,8 +22,7 @@ public abstract class AbstractFilter {
     protected int mVertexShaderId;
     //片段着色
     protected int mFragmentShaderId;
-
-
+    //着色器程序
     protected int mGLProgramId;
     /**
      * 顶点着色器
@@ -99,13 +98,10 @@ public abstract class AbstractFilter {
 
         // 获得着色器中的 attribute 变量 position 的索引值
         vPosition = GLES20.glGetAttribLocation(mGLProgramId, "vPosition");
-        vCoord = GLES20.glGetAttribLocation(mGLProgramId,
-                "vCoord");
-        vMatrix = GLES20.glGetUniformLocation(mGLProgramId,
-                "vMatrix");
+        vCoord = GLES20.glGetAttribLocation(mGLProgramId, "vCoord");
+        vMatrix = GLES20.glGetUniformLocation(mGLProgramId, "vMatrix");
         // 获得Uniform变量的索引值
-        vTexture = GLES20.glGetUniformLocation(mGLProgramId,
-                "vTexture");
+        vTexture = GLES20.glGetUniformLocation(mGLProgramId, "vTexture");
     }
 
 
@@ -121,7 +117,7 @@ public abstract class AbstractFilter {
 
 
     public int onDrawFrame(int textureId) {
-        //设置显示窗口
+        //设置显示窗口，这里传入的是全屏
         GLES20.glViewport(0, 0, mOutputWidth, mOutputHeight);
 
         //使用着色器
@@ -148,6 +144,9 @@ public abstract class AbstractFilter {
         //参数传完了 通知opengl 画画 从第0点开始 共4个点
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
+
+        //解绑
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         return textureId;
     }
 

@@ -47,7 +47,7 @@ public class OpenGLUtils {
         }
     }
 
-
+    //从 shader文件读出 字符串
     public static String readRawTextFile(Context context, int rawId) {
         InputStream is = context.getResources().openRawResource(rawId);
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
