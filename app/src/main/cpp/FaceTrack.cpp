@@ -30,6 +30,7 @@ void FaceTrack::stopTracking() {
 
 
 void FaceTrack::detector(Mat src, vector<Rect2f> &rects) {
+
     vector<Rect> faces;
     //src :图片 gray
     tracker->process(src);
@@ -45,9 +46,11 @@ void FaceTrack::detector(Mat src, vector<Rect2f> &rects) {
         //图像数据
         seeta::ImageData image_data(src.cols,src.rows);
         image_data.data = src.data;
+
         //指定人脸部位
         seeta::FaceInfo faceInfo;
         seeta::Rect bbox;
+
         bbox.x = face.x;
         bbox.y  = face.y;
         bbox.width = face.width;
@@ -59,6 +62,5 @@ void FaceTrack::detector(Mat src, vector<Rect2f> &rects) {
             //把点放入返回的集合
             rects.push_back(Rect2f(points[i].x,points[i].y,0,0));
         }
-
     }
 }

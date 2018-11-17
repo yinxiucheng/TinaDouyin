@@ -9,16 +9,13 @@ import com.tina.douyin.util.OpenGLUtils;
  * @author Lance
  * @date 2018/10/31
  */
-public abstract class AbstractFrameFilter extends AbstractFilter {
+public class AbstractFrameFilter extends AbstractFilter {
 
     protected int[] mFrameBuffers;
     protected int[] mFrameBufferTextures;
 
     public AbstractFrameFilter(Context context, int vertexShaderId, int fragmentShaderId) {
         super(context, vertexShaderId, fragmentShaderId);
-
-
-
     }
 
 

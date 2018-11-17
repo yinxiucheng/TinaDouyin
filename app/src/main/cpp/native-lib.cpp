@@ -80,7 +80,7 @@ Java_com_tina_douyin_face_FaceTrack_native_1detector(JNIEnv *env, jobject instan
     src.release();
     int ret = rects.size();
     if (ret) {
-        jclass clazz = env->FindClass("com/tina/douyin/face/com/Face");
+        jclass clazz = env->FindClass("com/tina/douyin/face/Face");
         jmethodID costruct = env->GetMethodID(clazz, "<init>", "(IIII[F)V");
         int size = ret * 2;
         //创建java 的float 数组

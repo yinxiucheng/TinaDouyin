@@ -28,8 +28,10 @@ public class FaceTrack {
     public FaceTrack(String model, String seeta, CameraHelper cameraHelper) {
         mCameraHelper = cameraHelper;
         self = native_create(model, seeta);
+
         mHandlerThread = new HandlerThread("track");
         mHandlerThread.start();
+
         mHandler = new Handler(mHandlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
@@ -58,11 +60,14 @@ public class FaceTrack {
 
 
     public void detector(byte[] data) {
+
         //把积压的 11号任务移除掉
         mHandler.removeMessages(11);
+
         //加入新的11号任务
         Message message = mHandler.obtainMessage(11);
         message.obj = data;
+
         mHandler.sendMessage(message);
     }
 
@@ -77,8 +82,7 @@ public class FaceTrack {
 
     private native void native_stop(long self);
 
-    private native Face native_detector(long self, byte[] data, int cameraId, int width, int
-            height);
+    private native Face native_detector(long self, byte[] data, int cameraId, int width, int height);
 
 
 }
