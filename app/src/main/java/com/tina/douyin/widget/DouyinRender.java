@@ -7,11 +7,14 @@ import android.opengl.EGL14;
 import android.opengl.EGLContext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
+import com.tina.douyin.face.Face;
 import com.tina.douyin.face.FaceTrack;
 import com.tina.douyin.filiter.BigEyeFilter;
 import com.tina.douyin.filiter.CameraFilter;
 import com.tina.douyin.filiter.ScreenFiliter;
+import com.tina.douyin.filiter.StickFilter;
 import com.tina.douyin.record.MediaRecorder;
 import com.tina.douyin.util.CameraHelper;
 import com.tina.douyin.util.OpenGLUtils;
@@ -43,6 +46,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private ScreenFiliter mScreenFiliter;
     private CameraFilter mCameraFiliter;
     private BigEyeFilter mBigEyeFilter;
+    private StickFilter mStickFilter;
     private MediaRecorder mMediaRecorder;
     private FaceTrack mFaceTrack;
 
@@ -74,7 +78,6 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mTextures = new int[1];
         //这里创建了纹理，直接应用了，没有配置。
         GLES20.glGenTextures(mTextures.length, mTextures, 0);
-
         mSurfaceTexture = new SurfaceTexture(mTextures[0]);
 
         mSurfaceTexture.setOnFrameAvailableListener(this);
@@ -83,6 +86,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mCameraFiliter = new CameraFilter(mDouyinView.getContext());
         mBigEyeFilter = new BigEyeFilter(mDouyinView.getContext());
         mScreenFiliter = new ScreenFiliter(mDouyinView.getContext());
+        mStickFilter = new StickFilter(mDouyinView.getContext());
 
         //渲染线程的上下文，需要给到自己的EGL环境下作为share_context
         EGLContext eglContext = EGL14.eglGetCurrentContext();
@@ -101,6 +105,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mCameraHelper.startPreview(mSurfaceTexture);
         mCameraFiliter.onReady(width, height);
         mBigEyeFilter.onReady(width, height);
+        mStickFilter.onReady(width, height);
         mScreenFiliter.onReady(width, height);
     }
 
@@ -124,12 +129,20 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mCameraFiliter.setMatrix(mtx);
         //返回处理后的纹理id
         int id = mCameraFiliter.onDrawFrame(mTextures[0]);
+
         //加效果滤镜
         // id  = 效果1.onDrawFrame(id);
         // id = 效果2.onDrawFrame(id);
         //......
-        mBigEyeFilter.setFace(mFaceTrack.getFace());
+        Face face = mFaceTrack.getFace();
+        if (null != face) {
+            Log.e("face", face.toString());
+        }
+        mBigEyeFilter.setFace(face);
         id = mBigEyeFilter.onDrawFrame(id);
+
+        mStickFilter.setFace(face);
+        id = mStickFilter.onDrawFrame(id);
         //加完之后显示到屏幕上去
         mScreenFiliter.onDrawFrame(id);
         //录制

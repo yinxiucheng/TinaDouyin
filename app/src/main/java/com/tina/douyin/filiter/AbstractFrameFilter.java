@@ -75,4 +75,17 @@ public class AbstractFrameFilter extends AbstractFilter {
         }
     }
 
+    @Override
+    protected void initCoordinate() {
+        mGLTextureBuffer.clear();
+        //从opengl画到opengl 不是画到屏幕， 修改坐标
+        float[] TEXTURE = {
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f
+        };
+        mGLTextureBuffer.put(TEXTURE);
+    }
+
 }
