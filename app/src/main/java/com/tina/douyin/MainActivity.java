@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 douyinView.stopRecord();
             }
         });
+
         RadioGroup radioGroup = findViewById(R.id.rg_speed);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             /**

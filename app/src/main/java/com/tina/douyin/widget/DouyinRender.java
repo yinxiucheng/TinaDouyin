@@ -1,5 +1,6 @@
 package com.tina.douyin.widget;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.EGL14;
@@ -7,10 +8,12 @@ import android.opengl.EGLContext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.tina.douyin.face.FaceTrack;
 import com.tina.douyin.filiter.CameraFilter;
 import com.tina.douyin.filiter.ScreenFiliter;
 import com.tina.douyin.record.MediaRecorder;
 import com.tina.douyin.util.CameraHelper;
+import com.tina.douyin.util.OpenGLUtils;
 
 import java.io.IOException;
 
@@ -39,9 +42,18 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private ScreenFiliter mScreenFiliter;
     private CameraFilter mCameraFiliter;
     private MediaRecorder mMediaRecorder;
+    private FaceTrack mFaceTrack;
 
     public DouyinRender(DouyinView douyinView){
         this.mDouyinView = douyinView;
+
+        Context context = douyinView.getContext();
+
+        //拷贝 模型
+        OpenGLUtils.copyAssets2SdCard(context, "lbpcascade_frontalface.xml",
+                "/sdcard/lbpcascade_frontalface.xml");
+        OpenGLUtils.copyAssets2SdCard(context, "seeta_fa_v1.1.bin",
+                "/sdcard/seeta_fa_v1.1.bin");
     }
 
     /**
@@ -52,8 +64,13 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
      */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        // 创建跟踪器
+        mFaceTrack = new FaceTrack("/sdcard/lbpcascade_frontalface.xml",
+                "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
+        //启动跟踪器
+        mFaceTrack.startTrack();
         //初始化操作
-        mCameraHelper = new CameraHelper(Camera.CameraInfo.CAMERA_FACING_BACK);
+        mCameraHelper = new CameraHelper(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
         //准备好画布
         mTextures = new int[1];
@@ -61,6 +78,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         GLES20.glGenTextures(mTextures.length, mTextures, 0);
 
         mSurfaceTexture = new SurfaceTexture(mTextures[0]);
+
         mSurfaceTexture.setOnFrameAvailableListener(this);
 
         //注意，必须在Gl线程中创建文件
@@ -68,7 +86,6 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         mScreenFiliter = new ScreenFiliter(mDouyinView.getContext());
 
         //渲染线程的上下文，需要给到自己的EGL环境下作为share_context
-
         EGLContext eglContext = EGL14.eglGetCurrentContext();
         mMediaRecorder = new MediaRecorder(mDouyinView.getContext(), "/sdcard/a.mp4", CameraHelper.HEIGHT, CameraHelper.WIDTH, eglContext);
     }
@@ -85,7 +102,6 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     @Override
     public void onDrawFrame(GL10 gl) {
         //配置屏幕
-
         //清理屏幕, 告诉opengl需要把屏幕清理成什么颜色
         GLES20.glClearColor(0, 0, 0, 0);
         //执行上一个：glClearColor配置的屏幕颜色
@@ -133,6 +149,6 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
     public void stopRecord() {
         mMediaRecorder.stop();
-
     }
+
 }

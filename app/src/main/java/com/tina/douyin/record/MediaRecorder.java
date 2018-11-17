@@ -105,7 +105,7 @@ public class MediaRecorder {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                //创建我们的子线程，用于
+                //创建我们的子线程，用于把预览的图像存储到虚拟Diaplay中去。
                 mEglBase = new EGLBase(mContext, mWidth, mHeight, mInputSurface, mEglContext);
                 //启动编码器
                 mMediaCodec.start();
@@ -138,6 +138,7 @@ public class MediaRecorder {
      * @param endOfStream 标记是否结束录制
      */
     private void getCodec(boolean endOfStream) {
+
         //不录了， 给mediacodec一个标记
         if (endOfStream) {
             mMediaCodec.signalEndOfInputStream();
@@ -165,7 +166,9 @@ public class MediaRecorder {
                 //配置封装器
                 // 增加一路指定格式的媒体流 视频
                 index = mMediaMuxer.addTrack(outputFormat);
+
                 mMediaMuxer.start();
+
             } else if (status == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 //忽略
             } else {

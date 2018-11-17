@@ -4,6 +4,8 @@ import android.content.Context;
 import android.opengl.GLES20;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -123,6 +125,26 @@ public class OpenGLUtils {
         GLES20.glDeleteShader(vShader);
         GLES20.glDeleteShader(fShader);
         return program;
+    }
+
+
+    public static void copyAssets2SdCard(Context context, String src, String dst) {
+        try {
+            File file = new File(dst);
+            if (!file.exists()) {
+                InputStream is = context.getAssets().open(src);
+                FileOutputStream fos = new FileOutputStream(file);
+                int len;
+                byte[] buffer = new byte[2048];
+                while ((len = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                }
+                is.close();
+                fos.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

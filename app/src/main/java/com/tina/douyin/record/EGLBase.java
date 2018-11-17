@@ -43,7 +43,7 @@ public class EGLBase {
         // 绘制线程中的图像 就是往这个mEglSurface 上面去画
         mEglSurface = EGL14.eglCreateWindowSurface(mEglDisplay, mEglConfig, surface, attrib_list, 0);
         // 绑定当前线程的显示设备及上下文， 之后操作opengl，就是在这个虚拟显示上操作
-        if (!EGL14.eglMakeCurrent(mEglDisplay,mEglSurface,mEglSurface,mEglContext)) {
+        if (!EGL14.eglMakeCurrent(mEglDisplay, mEglSurface, mEglSurface, mEglContext)) {
             throw  new RuntimeException("eglMakeCurrent 失败！");
         }
         //向虚拟屏幕画
