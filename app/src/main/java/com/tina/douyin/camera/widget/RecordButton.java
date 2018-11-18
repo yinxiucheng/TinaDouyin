@@ -1,4 +1,4 @@
-package com.tina.douyin.widget;
+package com.tina.douyin.camera.widget;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
 
-    <com.tina.douyin.widget.DouyinView
+    <com.tina.douyin.camera.widget.DouyinView
         android:id="@+id/douyinView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -76,7 +76,7 @@
 
 
 
-    <com.tina.douyin.widget.RecordButton
+    <com.tina.douyin.camera.widget.RecordButton
         android:id="@+id/btn_record"
         android:layout_width="80dp"
         android:layout_height="80dp"
@@ -92,6 +92,20 @@
         android:id="@+id/beauty"
         android:layout_width="wrap_content"
         android:text="美颜"
+        android:layout_height="wrap_content" />
+
+    <CheckBox
+        android:layout_toRightOf="@+id/beauty"
+        android:id="@+id/bigEye"
+        android:layout_width="wrap_content"
+        android:text="大眼"
+        android:layout_height="wrap_content" />
+
+    <CheckBox
+        android:layout_toRightOf="@+id/bigEye"
+        android:id="@+id/stick"
+        android:layout_width="wrap_content"
+        android:text="贴纸"
         android:layout_height="wrap_content" />
 
 </RelativeLayout>

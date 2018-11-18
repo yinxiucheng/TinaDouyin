@@ -1,11 +1,11 @@
-package com.tina.douyin.widget;
+package com.tina.douyin.camera.widget;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
-import com.tina.douyin.filiter.BeautyFilter;
+import com.tina.douyin.camera.record.MediaRecorder;
 
 /**
  * @author yxc
@@ -15,6 +15,10 @@ public class DouyinView extends GLSurfaceView {
 
     //默认正常速度
     private Speed mSpeed = Speed.MODE_NORMAL;
+
+    public void switchCamera() {
+        mRender.switchCamera();
+    }
 
 
     public enum Speed {
@@ -81,5 +85,17 @@ public class DouyinView extends GLSurfaceView {
 
     public void enableBeauty(boolean isChecked) {
         mRender.enableBeauty(isChecked);
+    }
+
+    public void enableStick(boolean isChecked) {
+        mRender.enableStick(isChecked);
+    }
+
+    public void enableBigEye(boolean isChecked) {
+        mRender.enableBigEye(isChecked);
+    }
+
+    public void setOnRecordFinishListener(MediaRecorder.OnRecordFinishListener listener){
+        mRender.setOnRecordFinishListener(listener);
     }
 }

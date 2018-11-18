@@ -1,4 +1,4 @@
-package com.tina.douyin.record;
+package com.tina.douyin.camera.record;
 
 import android.content.Context;
 import android.opengl.EGL14;
@@ -9,7 +9,7 @@ import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.view.Surface;
 
-import com.tina.douyin.filiter.ScreenFilter;
+import com.tina.douyin.camera.filiter.ScreenFilter;
 
 
 /**

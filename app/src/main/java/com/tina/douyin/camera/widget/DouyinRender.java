@@ -1,4 +1,4 @@
-package com.tina.douyin.widget;
+package com.tina.douyin.camera.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -9,14 +9,14 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.tina.douyin.face.Face;
-import com.tina.douyin.face.FaceTrack;
-import com.tina.douyin.filiter.BeautyFilter;
-import com.tina.douyin.filiter.BigEyeFilter;
-import com.tina.douyin.filiter.CameraFilter;
-import com.tina.douyin.filiter.ScreenFilter;
-import com.tina.douyin.filiter.StickFilter;
-import com.tina.douyin.record.MediaRecorder;
+import com.tina.douyin.camera.face.Face;
+import com.tina.douyin.camera.face.FaceTrack;
+import com.tina.douyin.camera.filiter.BeautyFilter;
+import com.tina.douyin.camera.filiter.BigEyeFilter;
+import com.tina.douyin.camera.filiter.CameraFilter;
+import com.tina.douyin.camera.filiter.ScreenFilter;
+import com.tina.douyin.camera.filiter.StickFilter;
+import com.tina.douyin.camera.record.MediaRecorder;
 import com.tina.douyin.util.CameraHelper;
 import com.tina.douyin.util.OpenGLUtils;
 
@@ -54,6 +54,8 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private int mWidth;
     private MediaRecorder mMediaRecorder;
     private FaceTrack mFaceTrack;
+    private MediaRecorder.OnRecordFinishListener mListener;
+
 
     public DouyinRender(DouyinView douyinView) {
         this.mDouyinView = douyinView;
@@ -89,13 +91,14 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
         //注意，必须在Gl线程中创建文件
         mCameraFiliter = new CameraFilter(mDouyinView.getContext());
-        mBigEyeFilter = new BigEyeFilter(mDouyinView.getContext());
+
         mScreenFiliter = new ScreenFilter(mDouyinView.getContext());
-        mStickFilter = new StickFilter(mDouyinView.getContext());
+
 
         //渲染线程的上下文，需要给到自己的EGL环境下作为share_context
         EGLContext eglContext = EGL14.eglGetCurrentContext();
         mMediaRecorder = new MediaRecorder(mDouyinView.getContext(), "/sdcard/a.mp4", CameraHelper.HEIGHT, CameraHelper.WIDTH, eglContext);
+        mMediaRecorder.setOnRecordFinishListener(mListener);
     }
 
     @Override
@@ -111,8 +114,6 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //开启预览
         mCameraHelper.startPreview(mSurfaceTexture);
         mCameraFiliter.onReady(width, height);
-        mBigEyeFilter.onReady(width, height);
-        mStickFilter.onReady(width, height);
         mScreenFiliter.onReady(width, height);
     }
 
@@ -145,11 +146,17 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         if (null != face) {
             Log.e("face", face.toString());
         }
-        mBigEyeFilter.setFace(face);
-        id = mBigEyeFilter.onDrawFrame(id);
 
-        mStickFilter.setFace(face);
-        id = mStickFilter.onDrawFrame(id);
+        if (null != mBigEyeFilter){
+            mBigEyeFilter.setFace(face);
+            id = mBigEyeFilter.onDrawFrame(id);
+        }
+
+        if (null != mStickFilter){
+            mStickFilter.setFace(face);
+            id = mStickFilter.onDrawFrame(id);
+        }
+
 
         if (null != mBeautyFilter) {
             id = mBeautyFilter.onDrawFrame(id);
@@ -205,4 +212,48 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
             }
         });
     }
+
+    public void enableStick(final boolean isChecked) {
+        mDouyinView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (isChecked) {
+                    mStickFilter = new StickFilter(mDouyinView.getContext());
+                    mStickFilter.onReady(mWidth, mHeight);
+                } else {
+                    mStickFilter.release();
+                    mStickFilter = null;
+                }
+            }
+        });
+    }
+
+    public void enableBigEye(final boolean isChecked) {
+        mDouyinView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (isChecked) {
+                    mBigEyeFilter = new BigEyeFilter(mDouyinView.getContext());
+                    mBigEyeFilter.onReady(mWidth, mHeight);
+                } else {
+                    mBigEyeFilter.release();
+                    mBigEyeFilter = null;
+                }
+            }
+        });
+    }
+
+    public void switchCamera() {
+        mCameraHelper.switchCamera();
+    }
+
+    public void setOnRecordFinishListener(MediaRecorder.OnRecordFinishListener listener){
+        if (null != mMediaRecorder){
+            mMediaRecorder.setOnRecordFinishListener(listener);
+        }
+        mListener = listener;
+    }
+
+
+
 }

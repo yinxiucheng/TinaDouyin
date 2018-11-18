@@ -1,4 +1,4 @@
-package com.tina.douyin.record;
+package com.tina.douyin.camera.record;
 
 import android.content.Context;
 import android.media.MediaCodec;
@@ -216,7 +216,26 @@ public class MediaRecorder {
                 mInputSurface = null;
                 mHandler.getLooper().quitSafely();
                 mHandler = null;
+
+                //录制完成，通过回调借口回调出去 并把录制的视频地址传出去
+                if (null != mListener){
+                    mListener.onRecordFinish(mPath);
+                }
             }
         });
+    }
+
+
+    /**
+     * 增加录制完成回调
+     */
+    private OnRecordFinishListener mListener;
+
+    public void setOnRecordFinishListener(OnRecordFinishListener listener){
+        mListener = listener;
+    }
+
+    public interface OnRecordFinishListener{
+        void onRecordFinish(String path);
     }
 }

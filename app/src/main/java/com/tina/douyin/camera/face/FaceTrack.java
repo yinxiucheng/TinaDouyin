@@ -1,4 +1,4 @@
-package com.tina.douyin.face;
+package com.tina.douyin.camera.face;
 
 import android.os.Handler;
 import android.os.HandlerThread;

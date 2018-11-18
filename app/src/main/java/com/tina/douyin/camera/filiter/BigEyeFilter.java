@@ -1,9 +1,9 @@
-package com.tina.douyin.filiter;
+package com.tina.douyin.camera.filiter;
 
 import android.content.Context;
 import android.opengl.GLES20;
 import com.tina.douyin.R;
-import com.tina.douyin.face.Face;
+import com.tina.douyin.camera.face.Face;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -1,4 +1,4 @@
-package com.tina.douyin.filiter;
+package com.tina.douyin.camera.filiter;
 
 import android.content.Context;
 import android.opengl.GLES20;

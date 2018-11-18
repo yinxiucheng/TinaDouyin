@@ -4,46 +4,11 @@
 
 using namespace std;
 
-extern "C"
-JNIEXPORT jlong JNICALL
-Java_com_tina_douyin_face_FaceTrack_native_1create(JNIEnv *env, jobject instance, jstring model_,
-                                                   jstring seeta_) {
-    const char *model = env->GetStringUTFChars(model_, 0);
-    const char *seeta = env->GetStringUTFChars(seeta_, 0);
-
-    FaceTrack *faceTrack = new FaceTrack(model, seeta);
-
-    env->ReleaseStringUTFChars(model_, model);
-    env->ReleaseStringUTFChars(seeta_, seeta);
-    return reinterpret_cast<jlong>(faceTrack);
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tina_douyin_face_FaceTrack_native_1start(JNIEnv *env, jobject instance, jlong self) {
-    if (self == 0) {
-        return;
-    }
-    FaceTrack *me = (FaceTrack *) self;
-    me->startTracking();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tina_douyin_face_FaceTrack_native_1stop(JNIEnv *env, jobject instance, jlong self) {
-    if (self == 0) {
-        return;
-    }
-    FaceTrack *me = (FaceTrack *) self;
-    me->stopTracking();
-    delete me;
-
-}
 
 
 extern "C"
 JNIEXPORT jobject JNICALL
-Java_com_tina_douyin_face_FaceTrack_native_1detector(JNIEnv *env, jobject instance, jlong self,
+Java_com_tina_douyin_camera_face_FaceTrack_native_1detector(JNIEnv *env, jobject instance, jlong self,
                                                      jbyteArray data_, jint cameraId, jint width,
                                                      jint height) {
     if (self == 0) {
@@ -80,7 +45,7 @@ Java_com_tina_douyin_face_FaceTrack_native_1detector(JNIEnv *env, jobject instan
     src.release();
     int ret = rects.size();
     if (ret) {
-        jclass clazz = env->FindClass("com/tina/douyin/face/Face");
+        jclass clazz = env->FindClass("com/tina/douyin/camera/face/Face");
         jmethodID costruct = env->GetMethodID(clazz, "<init>", "(IIII[F)V");
         int size = ret * 2;
         //创建java 的float 数组
@@ -98,4 +63,43 @@ Java_com_tina_douyin_face_FaceTrack_native_1detector(JNIEnv *env, jobject instan
         return face;
     }
     return NULL;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_tina_douyin_camera_face_FaceTrack_native_1create(JNIEnv *env, jobject instance,
+                                                          jstring model_, jstring seeta_) {
+    const char *model = env->GetStringUTFChars(model_, 0);
+    const char *seeta = env->GetStringUTFChars(seeta_, 0);
+
+    FaceTrack *faceTrack = new FaceTrack(model, seeta);
+
+    env->ReleaseStringUTFChars(model_, model);
+    env->ReleaseStringUTFChars(seeta_, seeta);
+    return reinterpret_cast<jlong>(faceTrack);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tina_douyin_camera_face_FaceTrack_native_1start(JNIEnv *env, jobject instance,
+                                                         jlong self) {
+    if (self == 0) {
+        return;
+    }
+    FaceTrack *me = (FaceTrack *) self;
+    me->startTracking();
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tina_douyin_camera_face_FaceTrack_native_1stop(JNIEnv *env, jobject instance, jlong self) {
+
+    if (self == 0) {
+        return;
+    }
+    FaceTrack *me = (FaceTrack *) self;
+    me->stopTracking();
+    delete me;
+
 }

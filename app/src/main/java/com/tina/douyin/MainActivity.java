@@ -1,13 +1,17 @@
 package com.tina.douyin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
-import com.tina.douyin.widget.DouyinView;
-import com.tina.douyin.widget.RecordButton;
+import com.tina.douyin.camera.record.MediaRecorder;
+import com.tina.douyin.camera.widget.DouyinView;
+import com.tina.douyin.camera.widget.RecordButton;
+import com.tina.douyin.video.VideoActivity;
 
 public class MainActivity extends AppCompatActivity {
     DouyinView douyinView;
@@ -66,6 +70,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ((CheckBox)findViewById(R.id.bigEye)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                douyinView.enableBigEye(isChecked);
+            }
+        });
+
+        ((CheckBox)findViewById(R.id.stick)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                douyinView.enableStick(isChecked);
+            }
+        });
 
         ((CheckBox)findViewById(R.id.beauty)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -73,6 +90,35 @@ public class MainActivity extends AppCompatActivity {
                 douyinView.enableBeauty(isChecked);
             }
         });
+
+
+        /**
+         * 录制完成
+         */
+        douyinView.setOnRecordFinishListener(new MediaRecorder.OnRecordFinishListener() {
+            @Override
+            public void onRecordFinish(final String path) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+                        intent.putExtra("path",path);
+                        startActivity(intent);
+                    }
+                });
+            }
+        });
+
+
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP){
+            douyinView.switchCamera();
+        }
+        return super.onTouchEvent(event);
     }
 
 
