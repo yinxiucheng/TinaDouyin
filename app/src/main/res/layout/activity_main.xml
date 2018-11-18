@@ -88,4 +88,10 @@
         android:text="按住拍" />
 
 
+    <CheckBox
+        android:id="@+id/beauty"
+        android:layout_width="wrap_content"
+        android:text="美颜"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>

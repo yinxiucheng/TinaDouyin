@@ -5,6 +5,8 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
+import com.tina.douyin.filiter.BeautyFilter;
+
 /**
  * @author yxc
  * @date 2018/11/3
@@ -14,12 +16,14 @@ public class DouyinView extends GLSurfaceView {
     //默认正常速度
     private Speed mSpeed = Speed.MODE_NORMAL;
 
+
     public enum Speed {
         MODE_EXTRA_SLOW, MODE_SLOW, MODE_NORMAL, MODE_FAST, MODE_EXTRA_FAST
     }
 
 
     DouyinRender mRender;
+
     public DouyinView(Context context) {
         this(context, null);
     }
@@ -43,7 +47,7 @@ public class DouyinView extends GLSurfaceView {
         mRender.onSurfaceDestroyed();
     }
 
-    public void setSpeed(Speed speed){
+    public void setSpeed(Speed speed) {
         mSpeed = speed;
     }
 
@@ -72,5 +76,10 @@ public class DouyinView extends GLSurfaceView {
 
     public void stopRecord() {
         mRender.stopRecord();
+    }
+
+
+    public void enableBeauty(boolean isChecked) {
+        mRender.enableBeauty(isChecked);
     }
 }

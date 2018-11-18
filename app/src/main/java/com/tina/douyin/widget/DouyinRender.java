@@ -11,9 +11,10 @@ import android.util.Log;
 
 import com.tina.douyin.face.Face;
 import com.tina.douyin.face.FaceTrack;
+import com.tina.douyin.filiter.BeautyFilter;
 import com.tina.douyin.filiter.BigEyeFilter;
 import com.tina.douyin.filiter.CameraFilter;
-import com.tina.douyin.filiter.ScreenFiliter;
+import com.tina.douyin.filiter.ScreenFilter;
 import com.tina.douyin.filiter.StickFilter;
 import com.tina.douyin.record.MediaRecorder;
 import com.tina.douyin.util.CameraHelper;
@@ -40,17 +41,21 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
     int[] mTextures;
 
+
     //变换矩阵
     private float[] mtx = new float[16];
 
-    private ScreenFiliter mScreenFiliter;
+    private ScreenFilter mScreenFiliter;
     private CameraFilter mCameraFiliter;
     private BigEyeFilter mBigEyeFilter;
     private StickFilter mStickFilter;
+    private BeautyFilter mBeautyFilter;
+    private int mHeight;
+    private int mWidth;
     private MediaRecorder mMediaRecorder;
     private FaceTrack mFaceTrack;
 
-    public DouyinRender(DouyinView douyinView){
+    public DouyinRender(DouyinView douyinView) {
         this.mDouyinView = douyinView;
 
         Context context = douyinView.getContext();
@@ -85,7 +90,7 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         //注意，必须在Gl线程中创建文件
         mCameraFiliter = new CameraFilter(mDouyinView.getContext());
         mBigEyeFilter = new BigEyeFilter(mDouyinView.getContext());
-        mScreenFiliter = new ScreenFiliter(mDouyinView.getContext());
+        mScreenFiliter = new ScreenFilter(mDouyinView.getContext());
         mStickFilter = new StickFilter(mDouyinView.getContext());
 
         //渲染线程的上下文，需要给到自己的EGL环境下作为share_context
@@ -95,6 +100,8 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        mWidth = width;
+        mHeight = height;
         // 创建跟踪器
         mFaceTrack = new FaceTrack("/sdcard/lbpcascade_frontalface.xml",
                 "/sdcard/seeta_fa_v1.1.bin", mCameraHelper);
@@ -143,6 +150,10 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
         mStickFilter.setFace(face);
         id = mStickFilter.onDrawFrame(id);
+
+        if (null != mBeautyFilter) {
+            id = mBeautyFilter.onDrawFrame(id);
+        }
         //加完之后显示到屏幕上去
         mScreenFiliter.onDrawFrame(id);
         //录制
@@ -178,5 +189,20 @@ public class DouyinRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     public void onPreviewFrame(byte[] data, Camera camera) {
         //data 送去跟踪器检测人脸 与 关键点定位。 这个detector很耗时，开线程
         mFaceTrack.detector(data);
+    }
+
+    public void enableBeauty(final boolean isChecked) {
+        mDouyinView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (isChecked) {
+                    mBeautyFilter = new BeautyFilter(mDouyinView.getContext());
+                    mBeautyFilter.onReady(mWidth, mHeight);
+                } else {
+                    mBeautyFilter.release();
+                    mBeautyFilter = null;
+                }
+            }
+        });
     }
 }

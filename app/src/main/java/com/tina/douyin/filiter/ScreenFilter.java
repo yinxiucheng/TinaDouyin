@@ -16,9 +16,9 @@ import javax.microedition.khronos.opengles.GL11Ext;
  * @author yxc
  * @date 2018/11/3
  */
-public class ScreenFiliter extends AbstractFilter {
+public class ScreenFilter extends AbstractFilter {
 
-    public ScreenFiliter(Context context) {
+    public ScreenFilter(Context context) {
         super(context, R.raw.base_vertex,R.raw.base_frag);
     }
 }

@@ -2,6 +2,8 @@ package com.tina.douyin;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
 import com.tina.douyin.widget.DouyinView;
@@ -61,6 +63,14 @@ public class MainActivity extends AppCompatActivity {
                         douyinView.setSpeed(DouyinView.Speed.MODE_EXTRA_FAST);
                         break;
                 }
+            }
+        });
+
+
+        ((CheckBox)findViewById(R.id.beauty)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                douyinView.enableBeauty(isChecked);
             }
         });
     }

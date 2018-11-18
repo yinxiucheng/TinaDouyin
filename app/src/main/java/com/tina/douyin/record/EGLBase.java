@@ -9,7 +9,7 @@ import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.view.Surface;
 
-import com.tina.douyin.filiter.ScreenFiliter;
+import com.tina.douyin.filiter.ScreenFilter;
 
 
 /**
@@ -19,7 +19,7 @@ import com.tina.douyin.filiter.ScreenFiliter;
 public class EGLBase {
 
     private final EGLSurface mEglSurface;
-    private final ScreenFiliter mScreenFilter;
+    private final ScreenFilter mScreenFilter;
     private EGLDisplay mEglDisplay;
     private EGLConfig mEglConfig;
     private EGLContext mEglContext;
@@ -47,7 +47,7 @@ public class EGLBase {
             throw  new RuntimeException("eglMakeCurrent 失败！");
         }
         //向虚拟屏幕画
-        mScreenFilter = new ScreenFiliter(context);
+        mScreenFilter = new ScreenFilter(context);
         mScreenFilter.onReady(width,height);
     }
 
